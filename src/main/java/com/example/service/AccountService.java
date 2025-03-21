@@ -11,7 +11,6 @@ import com.example.repository.AccountRepository;
 @Service
 public class AccountService {
 
-    // @Autowired
     private AccountRepository accountRepository;
     
     @Autowired
@@ -28,7 +27,13 @@ public class AccountService {
         return null;
     }
 
-    //List<Account> getAccounts();
+    public Account login(String username, String password){
+        Account account = getAccByUsername(username);
+        if(account != null && account.getPassword().equals(password)){
+            return account;
+        }
+        return null;
+    }
 
     public Account getAccountById(Integer id){
         Optional<Account> optAcc = accountRepository.findById(id);

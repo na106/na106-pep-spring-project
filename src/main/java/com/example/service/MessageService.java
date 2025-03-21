@@ -6,13 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.entity.Message;
-// import com.example.repository.AccountRepository;
 import com.example.repository.MessageRepository;
 
 @Service
 public class MessageService {
 
-    // @Autowired
     private MessageRepository messageRepository;
 
     @Autowired
@@ -44,12 +42,12 @@ public class MessageService {
     }
 
     public Message updateMessage(Integer id, Message message){
-        if(messageRepository.existsById(id)) {
+        if(!messageRepository.findById(id).isEmpty()) {
             if(message.getMessageText().isEmpty()){
-                throw new IllegalArgumentException("Cannot have empty text");
+                return null;
             }
             if(message.getMessageText().length() > 255){
-                throw new IllegalArgumentException("Text amount above limit");
+                return null;
             }
             return messageRepository.save(message);
         }

@@ -29,13 +29,7 @@ import com.example.service.MessageService;
 @RestController
 public class SocialMediaController {
 
-    // @Autowired
     private AccountService accountService;
-    
-    // @Autowired
-    // private AccountRepository accountRepository;
-
-    // @Autowired
     private MessageService messageService;
 
     @Autowired
@@ -52,6 +46,15 @@ public class SocialMediaController {
         }
         Account savedAccount = accountService.saveAccount(account);
         return new ResponseEntity<>(savedAccount, HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Account> login(@RequestBody Account account){
+        Account loggedAcc = accountService.login(account.getUsername(), account.getPassword());
+        if(loggedAcc != null) {
+            return new ResponseEntity<>(loggedAcc, HttpStatus.OK);
+        } 
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/messages")
@@ -84,7 +87,7 @@ public class SocialMediaController {
     @PostMapping("/messages")
     public ResponseEntity<Message> addMessage(@RequestBody Message message){
         
-        if(message.getMessageText().isEmpty() || message.getMessageText().length() > 254){
+        if(message.getMessageText().isEmpty() || message.getMessageText().length() > 255){
             return ResponseEntity.badRequest().build();
         }
 
@@ -95,21 +98,21 @@ public class SocialMediaController {
         return ResponseEntity.ok(newMessage);
     }
 
-    @PatchMapping("/messages/{}messageID")
+    @PatchMapping("/messages/{messageId}")
         public ResponseEntity<?> updateMessage(@PathVariable Integer messageId, @RequestBody Message messageUpdate){
             try{
-                if(messageUpdate.getMessageText().trim().isEmpty() || messageUpdate.getMessageText().length() > 255){
-                    return null;
+                if(messageUpdate.getMessageText().isEmpty() 
+                || messageUpdate.getMessageText().length() > 255) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 Message updatedMsg = messageService.updateMessage(messageId, messageUpdate);
                 if(updatedMsg == null){
-                    return null;
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 return ResponseEntity.ok(1);
             } catch(Exception e){
                 return ResponseEntity.badRequest().body(e.getMessage());
             }
-
         }
     
     @DeleteMapping("/messages/{messageId}")
